@@ -83,10 +83,9 @@ function Dashboard({ date }) {
       );
 
       setReservations(
-        (reservations) =>
-          (reservations = result.sort(
-            (resA, resB) => resA.reservation_time > resB.reservation_time
-          ))
+        result.sort(
+          (resA, resB) => resA.reservation_time > resB.reservation_time
+        )
       );
     } catch (error) {
       setReservationsError(error);
@@ -136,11 +135,11 @@ function Dashboard({ date }) {
 
   // format tables list to jsx elements
   const tablesList = tables.map((table) => {
-    let backgroundColor = table.reservation_id?"occupied":"free"
+    let backgroundColor = table.reservation_id ? "occupied" : "free";
     return (
       <li className={`list-group-item ${backgroundColor}`} key={table.table_id}>
         <div>
-          <card className="row">
+          <div className="row">
             <div className="col">
               <h4>Table Name</h4>
               <p>{table.table_name}</p>
@@ -172,7 +171,7 @@ function Dashboard({ date }) {
                 <span className="badge bg-primary">free</span>
               </div>
             )}
-          </card>
+          </div>
         </div>
       </li>
     );

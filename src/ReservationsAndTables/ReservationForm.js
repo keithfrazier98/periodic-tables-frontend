@@ -3,6 +3,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { createReservation, editReservation } from "../utils/api";
 import { today, formatDate, asDateString } from "../utils/date-time";
 import ErrorAlert from "../layout/ErrorAlert";
+import { changeStatus } from "../utils/api";
+
 const newToday = today();
 
 function ReservationForm({ initialFormData }) {
@@ -11,9 +13,8 @@ function ReservationForm({ initialFormData }) {
   const isEdit = pathname.includes("edit");
   const isNew = pathname.includes("new");
 
-
   const [reservation, setReservation] = useState({ ...initialFormData });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [validDate, setValidDate] = useState(true);
   const [validTime, setValidTime] = useState(true);
 
@@ -126,9 +127,46 @@ function ReservationForm({ initialFormData }) {
     setReservation({ ...reservation, [name]: value });
   }
 
+  function navigateToDashboard() {
+    history.push(`/dashboard?date=${reservation.reservation_date}`);
+  }
+
+  const [cancelled, setCancelled] = useState("");
+
+  useEffect(() => {
+    console.log(cancelled);
+    if (cancelled) {
+      changeStatusCancel(cancelled);
+      navigateToDashboard()
+    }
+  }, [cancelled]);
+
+  // call api to cancel reservation
+  async function changeStatusCancel(cancelledReservation) {
+    const abortController = new AbortController();
+    await changeStatus(
+      "cancelled",
+      cancelledReservation,
+      abortController.signal
+    );
+    setCancelled((can) => (can = ""));
+    return () => abortController.abort();
+  }
+
+  function cancelBtnHandler(event) {
+    event.preventDefault();
+    if (
+      window.confirm(
+        "Do you want to cancel this reservation? This cannot be undone."
+      )
+    ) {
+      setCancelled((cancelled) => (cancelled = reservation.reservation_id));
+    }
+  }
+
   async function APIOnSubmit(event) {
     const abortController = new AbortController();
-    setError(null)
+    setError(null);
     //if this is an edit: call editReservation from API, else: call is createReservation from API
     if (isEdit) {
       try {
@@ -157,11 +195,6 @@ function ReservationForm({ initialFormData }) {
     return () => abortController.abort();
   }
 
-  function navigateToDashboard() {
-      setReservation({ ...initialFormData });
-      history.push(`/dashboard?date=${reservation.reservation_date}`);
-  }
-
   function handleSubmit(event) {
     event.preventDefault();
     APIOnSubmit(event);
@@ -175,7 +208,7 @@ function ReservationForm({ initialFormData }) {
       <form onSubmit={handleSubmit}>
         <div className="row">
           <div className="col">
-            <label for="first_name">First Name</label>
+            <label htmlFor="first_name">First Name</label>
             <br />
             <input
               type="text"
@@ -186,7 +219,7 @@ function ReservationForm({ initialFormData }) {
             />
           </div>
           <div className="col">
-            <label for="last_name">Last Name</label>
+            <label htmlFor="last_name">Last Name</label>
             <br />
             <input
               type="text"
@@ -199,7 +232,7 @@ function ReservationForm({ initialFormData }) {
         </div>
         <div className="row">
           <div className="col">
-            <label for="mobile_number">Mobile Number</label>
+            <label htmlFor="mobile_number">Mobile Number</label>
             <br />
             <input
               type="text"
@@ -210,7 +243,7 @@ function ReservationForm({ initialFormData }) {
             />
           </div>
           <div className="col">
-            <label for="people">Party Size</label>
+            <label htmlFor="people">Party Size</label>
             <br />
             <input
               type="text"
@@ -223,7 +256,7 @@ function ReservationForm({ initialFormData }) {
         </div>
         <div className="row">
           <div className="col">
-            <label for="reservation_date">Date of Reservation</label>
+            <label htmlFor="reservation_date">Date of Reservation</label>
             <br />
             <input
               type="date"
@@ -241,7 +274,7 @@ function ReservationForm({ initialFormData }) {
             </div>
           </div>
           <div className="col">
-            <label for="reservation_time">Time of Reservation</label>
+            <label htmlFor="reservation_time">Time of Reservation</label>
             <br />
             <input
               type="time"
@@ -281,7 +314,9 @@ function ReservationForm({ initialFormData }) {
           </button>
           {isEdit ? (
             <div>
-              <button className="btn btn-danger">Cancel Reservation</button>
+              <button onClick={cancelBtnHandler} className="btn btn-danger">
+                Cancel Reservation
+              </button>
             </div>
           ) : null}
         </div>

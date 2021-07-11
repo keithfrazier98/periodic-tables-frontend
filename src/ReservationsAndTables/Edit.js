@@ -5,7 +5,7 @@ import ReservationForm from "./ReservationForm";
 
 function Edit() {
   const { reservation_id } = useParams();
-  const [initialFormData, setInitialFormData] = useState({});
+  const [initialFormData, setInitialFormData] = useState({reservation_id: reservation_id});
 
 
   useEffect(() => {
