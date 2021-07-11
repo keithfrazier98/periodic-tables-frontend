@@ -78,6 +78,7 @@ function Search() {
                   className="w-75 p-1"
                   type="search"
                   value={mobile_number}
+                  onClick={() => {if (mobile_number === placeholder) setMobileNumber("")}}
                   onChange={onChange}
                   name="mobile_number"
                 ></input>

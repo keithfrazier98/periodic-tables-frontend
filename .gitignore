@@ -19,6 +19,7 @@
 .env.test.local
 .env.production.local
 .vercel
+.eslintcache
 
 npm-debug.log*
 yarn-debug.log*
