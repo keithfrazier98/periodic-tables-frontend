@@ -15,8 +15,7 @@ function ReservationForm({ initialFormData }) {
 
   const [reservation, setReservation] = useState({ ...initialFormData });
   const [error, setError] = useState("");
-  const [validDate, setValidDate] = useState(true);
-  const [validTime, setValidTime] = useState(true);
+  const [submitAttempt, setSubmitAttempt] = useState(false);
 
   useEffect(() => {
     let dateChosen = new Date(initialFormData.reservation_date);
@@ -26,7 +25,7 @@ function ReservationForm({ initialFormData }) {
         reservation_date: asDateString(dateChosen),
       });
     }
-  }, [initialFormData]);
+  }, []);
 
   function validReservationDates({ target }) {
     // dates must be in converted from yyyy/mm/dd to mm/dd/yyyy for Date.prototype conversion
@@ -42,18 +41,34 @@ function ReservationForm({ initialFormData }) {
       isThisMonthOrAfter &&
       isThisYearOrAfter
     ) {
-      setValidDate(true);
+      setError("");
+      setSubmitAttempt(false);
       setReservation(
         (form) => (form = { ...form, reservation_date: target.value })
       );
     } else {
-      setReservation((form) => (form = { ...form, reservation_date: "" }));
-      setValidDate(false);
+      setReservation(
+        (form) => (form = { ...form, reservation_date: target.value })
+      );
+      setError({
+        message: "Please enter a valid date. (We are closed on tuesdays)",
+      });
     }
+  }
+
+  function badTime(){
+    setError({
+      message:
+        "Please enter a valid time. (We reserve tables from 10:30AM to 9:30PM on every half hour.)",
+    });
   }
 
   function validReservationTimes({ target }) {
     let timeChosen = target.value;
+    setReservation(
+      (form) => (form = { ...form, reservation_time: timeChosen })
+    );
+
     let chosenMinutes = Number(`${timeChosen[3]}${timeChosen[4]}`);
     let chosenHour = Number(`${timeChosen[0]}${timeChosen[1]}`);
     const MintoNextHalfHour = 30 - chosenMinutes;
@@ -63,6 +78,8 @@ function ReservationForm({ initialFormData }) {
     const currentTime = new Date(Date.now());
     const currentHour = currentTime.getHours();
     const currentMinute = currentTime.getMinutes();
+
+    
 
     if (chosenMinutes === 30) {
       timeChosen = `${timeChosen.join("")}:${chosenMinutes}`;
@@ -78,48 +95,38 @@ function ReservationForm({ initialFormData }) {
     }
 
     //return error message if chosen time is outsisde operating hours
+    console.log(chosenHour, chosenMinutes)
+
     if (
-      (chosenHour === 21 && chosenMinutes === 30) ||
+      (chosenHour === 22 && chosenMinutes === 30) ||
       chosenHour > 21 ||
       (chosenHour === 10 && chosenMinutes === 0) ||
       chosenHour < 10
     ) {
-      setReservation((form) => (form = { ...form, reservation_time: "" }));
-      return setValidTime(false);
-    } else {
-      setValidTime(true);
-    }
-
-    if (reservation.reservation_date === newToday) {
+     console.log("out")
+      badTime()
+    } else if (reservation.reservation_date === newToday) {
       // if the chosen hour is later than the current hour (current hour is less than chosen hour) set reservation time
       if (currentHour < chosenHour) {
-        setValidTime(true);
-        setReservation(
-          (form) => (form = { ...form, reservation_time: timeChosen })
-        );
+        setError("");
+        setSubmitAttempt(false);
       }
       // if the chosen hour is earlier than the current hour (current hour is greater than the chosen hour ) display error message
       else if (currentHour > chosenHour) {
-        setValidTime(false);
+        badTime()
       }
       // if hours are the same check minutes
       else {
         // if the chosen minute is later than the current minute ( current minute is less than the chosen minute ) set reservation time
         if (currentMinute < chosenMinutes) {
-          setValidTime(true);
-          setReservation(
-            (form) => (form = { ...form, reservation_time: timeChosen })
-          );
+          setError("");
+          setSubmitAttempt(false);
         }
         // if the chosen minute is earlier than the current minute (current minute is greater than chosen minute) display error message
         else {
-          setValidTime(false);
+          badTime()
         }
       }
-    } else {
-      setReservation(
-        (form) => (form = { ...form, reservation_time: timeChosen })
-      );
     }
   }
 
@@ -137,7 +144,7 @@ function ReservationForm({ initialFormData }) {
     console.log(cancelled);
     if (cancelled) {
       changeStatusCancel(cancelled);
-      navigateToDashboard()
+      navigateToDashboard();
     }
   }, [cancelled]);
 
@@ -197,13 +204,15 @@ function ReservationForm({ initialFormData }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    APIOnSubmit(event);
+    setSubmitAttempt(true);
+    console.log(error);
+    if (!error) {
+      APIOnSubmit(event);
+    }
   }
   return (
     <div>
-      <div>
-        <ErrorAlert error={error} />
-      </div>
+      <div>{submitAttempt ? <ErrorAlert error={error} /> : null}</div>
 
       <form onSubmit={handleSubmit}>
         <div className="row">
@@ -265,35 +274,17 @@ function ReservationForm({ initialFormData }) {
               value={reservation.reservation_date}
               required={true}
             />
-            <div>
-              {validDate ? null : (
-                <p className="alert alert-danger">
-                  Please enter a valid date. (We are closed on tuesdays)
-                </p>
-              )}
-            </div>
           </div>
           <div className="col">
             <label htmlFor="reservation_time">Time of Reservation</label>
             <br />
             <input
               type="time"
-              step="300"
-              min="10:30"
-              max="21:30"
               onChange={validReservationTimes}
               name="reservation_time"
               value={reservation.reservation_time}
               required={true}
             />
-            <div>
-              {validTime ? null : (
-                <p className="alert alert-danger">
-                  Please enter a valid time. (We reserve tables from 10:30AM to
-                  9:30PM on every half hour.)
-                </p>
-              )}
-            </div>
           </div>
         </div>
         <div

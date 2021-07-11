@@ -50,6 +50,27 @@
    }
  }
  
+
+ 
+/**
+ * Creates a new reservation
+ * @returns {Promise<[reservation]>}
+ *  a promise that resolves to the newly created reservation.
+ */
+ export async function createReservation(reservation, signal) {
+  const url = `${API_BASE_URL}/reservations`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: reservation }),
+    signal,
+  };
+  return await fetchJson(url, options, reservation);
+}
+
+
+//old function
+/* 
  export async function createReservation(reservationData, signal) {
    const url = `${API_BASE_URL}/reservations`;
    const options = {
@@ -61,7 +82,25 @@
  
    return await fetchJson(url, options);
  }
- 
+ */
+
+ /**
+ * Creates a new table
+ * @returns {Promise<[table]>}
+ *  a promise that resolves to the newly created table.
+ */
+export async function createTable(table, signal) {
+  const url = `${API_BASE_URL}/tables`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: table }),
+    signal,
+  };
+  return await fetchJson(url, options, table);
+}
+//old function
+/* 
  export async function createTable(tableData, signal) {
    const url = `${API_BASE_URL}/tables`;
    const options = {
@@ -73,7 +112,8 @@
  
    return await fetchJson(url, options);
  }
- 
+ */
+
  export async function finishReservation(tableId, signal) {
    const url = `${API_BASE_URL}/tables/${tableId}/seat`;
    const options = {
@@ -85,6 +125,19 @@
    return await fetchJson(url, options, signal);
  }
  
+//seat reservation
+ export async function assignResIdToTable (reservation_id, table_id) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "PUT",
+    body: JSON.stringify({ data: { reservation_id } }),
+    headers,
+  };
+  return await fetchJson(url, options, {});
+}
+
+//old function
+/*
  export async function assignResIdToTable(reservation_id, table_id, signal) {
    const url = new URL(`${API_BASE_URL}/tables/${table_id}/seat`);
    const options = {
@@ -95,7 +148,7 @@
    };
    return await fetchJson(url, options);
  }
- 
+ */
  export async function listTables(signal) {
    const url = new URL(`${API_BASE_URL}/tables`);
    return await fetchJson(url, { headers, signal }, []);
