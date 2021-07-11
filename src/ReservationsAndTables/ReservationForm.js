@@ -12,6 +12,8 @@ function ReservationForm({ initialFormData }) {
   const { pathname } = useLocation();
   const isEdit = pathname.includes("edit");
   const isNew = pathname.includes("new");
+  console.log(initialFormData)
+
 
   const [reservation, setReservation] = useState({ ...initialFormData });
   const [error, setError] = useState("");
@@ -25,7 +27,7 @@ function ReservationForm({ initialFormData }) {
         reservation_date: asDateString(dateChosen),
       });
     }
-  }, []);
+  }, [initialFormData]);
 
   function validReservationDates({ target }) {
     // dates must be in converted from yyyy/mm/dd to mm/dd/yyyy for Date.prototype conversion
