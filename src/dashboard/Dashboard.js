@@ -65,15 +65,7 @@ function Dashboard({ date }) {
   // call api to load reservation data
   async function loadReservations() {
     const abortController = new AbortController();
-    const { resId } = finishIds;
     try {
-      if (resId) {
-        try {
-          await changeStatus("finished", resId, abortController.signal);
-        } catch (error) {
-          setReservationsError(error);
-        }
-      }
 
       setReservationsError(null);
       const result = await listReservations({ date }, abortController.signal);
