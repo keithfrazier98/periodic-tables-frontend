@@ -4,7 +4,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 
 const { containsText } = require("./utils");
-const { createReservation, createTable, seatReservation } = require("./api");
+const { createReservation, createTable, seatReservation, finishReservation } = require("./api");
 
 const baseURL = process.env.BASE_URL || "http://localhost:3000";
 
@@ -75,7 +75,7 @@ describe("US-06 - Reservation status - E2E", () => {
         path: ".screenshots/us-06-seated-before.png",
         fullPage: true,
       });
-
+      console.log("1",reservation.reservation_id, table.table_id)
       await seatReservation(reservation.reservation_id, table.table_id);
 
       await page.reload({ waitUntil: "networkidle0" });
@@ -100,6 +100,7 @@ describe("US-06 - Reservation status - E2E", () => {
     });
 
     test("Finishing the table removes the reservation from the list", async () => {
+      console.log("2",reservation.reservation_id, table.table_id)
       await seatReservation(reservation.reservation_id, table.table_id);
 
       await page.reload({ waitUntil: "networkidle0" });

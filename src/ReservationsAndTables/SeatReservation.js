@@ -113,7 +113,7 @@ function SeatReservation() {
 
     if (partyIsSmallerThanCap) {
       setPartyIsSmallerThanCap(true);
-      await changeStatus("seated", reservation_id);
+      //await changeStatus("seated", reservation_id);
       await assignResIdToTable(
         reservation_id,
         selection,

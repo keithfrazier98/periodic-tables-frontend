@@ -33,6 +33,7 @@ describe("US-07 - Search reservations - E2E", () => {
 
   describe("/search page", () => {
     test("entering an existing mobile number and submitting displays the matched records", async () => {
+      await Promise.resolve(page.click("input[name=mobile_number]"))
       await page.type("input[name=mobile_number]", "808-555-0140");
 
       await page.screenshot({
@@ -55,6 +56,7 @@ describe("US-07 - Search reservations - E2E", () => {
     });
 
     test("entering an non-existent phone number and submitting displays a No reservations found message", async () => {
+      await Promise.resolve(page.click("input[name=mobile_number]"))
       await page.type("input[name=mobile_number]", "1231231232");
 
       await page.screenshot({

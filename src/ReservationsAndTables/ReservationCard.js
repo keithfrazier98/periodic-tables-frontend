@@ -41,14 +41,14 @@ function ReservationCard({ reservations, setCancelled }) {
       // reservations can only be canceled, seated, or edited if they have status "booked"
       const booked = status === "booked";
       const buttons = (
-        <div className="row justify-content-end">
+        <div className="row justify-content-end" >
           <div>
             <a
               className="btn btn-outline-warning"
               href={`/reservations/${reservation_id}/edit`}
               role="button"
             >
-              Edit
+              edit
             </a>
           </div>
           <div>
@@ -58,7 +58,7 @@ function ReservationCard({ reservations, setCancelled }) {
               onClick={cancelBtnHandler}
               data-reservation-id-cancel={reservation.reservation_id}
             >
-              Cancel
+              cancel
             </button>
           </div>
           <a
@@ -66,7 +66,7 @@ function ReservationCard({ reservations, setCancelled }) {
             role="button"
             className="btn btn-outline-primary"
           >
-            Seat
+            seat
           </a>
         </div>
       );

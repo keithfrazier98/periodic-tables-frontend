@@ -39,17 +39,22 @@ function Dashboard({ date }) {
   //states for tables data and errors
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
+  const [tablesLoaded, setTablesLoaded] = useState(false)
 
   //called on initial render and state update to render table
   //and reservation data
   useEffect(() => {
     loadTables();
-    loadReservations();
     if (cancelled) {
       changeStatusCancel(cancelled);
     }
   }, [date, cancelled, finishIds]);
 
+  useEffect(() => {
+    if(tablesLoaded){
+      loadReservations();
+    }
+  }, [tablesLoaded]);
   // call api to cancel reservation
   async function changeStatusCancel(cancelledReservation) {
     const abortController = new AbortController();
@@ -64,9 +69,9 @@ function Dashboard({ date }) {
 
   // call api to load reservation data
   async function loadReservations() {
+    console.log("loading reservations")
     const abortController = new AbortController();
     try {
-
       setReservationsError(null);
       const result = await listReservations({ date }, abortController.signal);
       result.filter(
@@ -87,6 +92,7 @@ function Dashboard({ date }) {
 
   // call api to load tables data
   async function loadTables() {
+    setTablesLoaded(false)
     setTables((tables) => (tables = []));
     setTablesError((error) => (error = null));
     const { tableId } = finishIds;
@@ -101,7 +107,8 @@ function Dashboard({ date }) {
         }
       }
       const fetchedTables = await listTables(abortController.signal);
-      setTables((tables) => (tables = fetchedTables));
+      setTables((tbls) => (tbls = fetchedTables));
+      setTablesLoaded(true)
     } catch (error) {
       setTablesError(error);
     }
@@ -115,13 +122,10 @@ function Dashboard({ date }) {
         "Is this table ready to seat new guests? This cannot be undone."
       )
     ) {
-      setFinishIds(
-        (ids) =>
-          (ids = {
-            tableId: target.dataset.tableIdFinish,
-            resId: target.dataset.reservationIdFinish,
-          })
-      );
+      setFinishIds({
+        tableId: target.dataset.tableIdFinish,
+        resId: target.dataset.reservationIdFinish,
+      });
     }
   }
 
@@ -160,7 +164,7 @@ function Dashboard({ date }) {
               </div>
             ) : (
               <div>
-                <span className="badge bg-primary">free</span>
+                <span data-table-id-status={table.table_id} className="badge bg-primary">free</span>
               </div>
             )}
           </div>

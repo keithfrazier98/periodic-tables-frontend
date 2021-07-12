@@ -12,8 +12,6 @@ function ReservationForm({ initialFormData }) {
   const { pathname } = useLocation();
   const isEdit = pathname.includes("edit");
   const isNew = pathname.includes("new");
-  console.log(initialFormData)
-
 
   const [reservation, setReservation] = useState({ ...initialFormData });
   const [error, setError] = useState("");
@@ -37,11 +35,13 @@ function ReservationForm({ initialFormData }) {
     const isThisDayOrAfter = dateChosen.getDate() >= today.getDate();
     const isThisMonthOrAfter = dateChosen.getMonth() >= today.getMonth();
     const isThisYearOrAfter = dateChosen.getFullYear() >= today.getFullYear();
+    const isAfterThisYear = dateChosen.getFullYear() - today.getFullYear() > 0;
     if (
-      isNotTuesday &&
-      isThisDayOrAfter &&
-      isThisMonthOrAfter &&
-      isThisYearOrAfter
+      (isNotTuesday &&
+        isThisDayOrAfter &&
+        isThisMonthOrAfter &&
+        isThisYearOrAfter) ||
+      isAfterThisYear
     ) {
       setError("");
       setSubmitAttempt(false);
@@ -56,58 +56,72 @@ function ReservationForm({ initialFormData }) {
         message: "Please enter a valid date. (We are closed on tuesdays)",
       });
     }
+
+    // validate time in case date was set after time
+    validReservationTimes()
   }
 
-  function badTime(){
+  function badTime() {
     setError({
       message:
-        "Please enter a valid time. (We reserve tables from 10:30AM to 9:30PM on every half hour.)",
+        "Please enter a valid time. (We reserve tables from 10:30AM to 9:30PM.)",
     });
   }
 
-  function validReservationTimes({ target }) {
-    let timeChosen = target.value;
+  function validReservationTimes({ target } = reservation.reservation_time) {
+    let timeChosen 
+
+    if(target){
+      timeChosen = target.value;
+    } else {
+      timeChosen = reservation.reservation_time
+    }
+
     setReservation(
       (form) => (form = { ...form, reservation_time: timeChosen })
     );
 
+    console.log(reservation, timeChosen);
     let chosenMinutes = Number(`${timeChosen[3]}${timeChosen[4]}`);
     let chosenHour = Number(`${timeChosen[0]}${timeChosen[1]}`);
-    const MintoNextHalfHour = 30 - chosenMinutes;
-    timeChosen = timeChosen.split("");
-    timeChosen = timeChosen.splice(0, 2);
+ 
 
     const currentTime = new Date(Date.now());
     const currentHour = currentTime.getHours();
     const currentMinute = currentTime.getMinutes();
+    console.log(chosenHour, chosenMinutes);
 
     
-
-    if (chosenMinutes === 30) {
-      timeChosen = `${timeChosen.join("")}:${chosenMinutes}`;
-    } else if (chosenMinutes === 0) {
-      timeChosen = `${timeChosen.join("")}:${chosenMinutes}0`;
-    } else if (MintoNextHalfHour > 0) {
-      timeChosen = `${timeChosen.join("")}:30`;
-      chosenMinutes = 30;
-    } else if (MintoNextHalfHour < 0) {
-      chosenHour = Number(timeChosen.join("")) + 1;
-      timeChosen = `${chosenHour}:00`;
-      chosenMinutes = 0;
-    }
-
     //return error message if chosen time is outsisde operating hours
-    console.log(chosenHour, chosenMinutes)
 
+    console.log(chosenHour, chosenMinutes)
     if (
-      (chosenHour === 22 && chosenMinutes === 30) ||
+      (chosenHour >= 21 && chosenMinutes > 30) ||
       chosenHour > 21 ||
-      (chosenHour === 10 && chosenMinutes === 0) ||
+      (chosenHour <= 10 && chosenMinutes < 30) ||
       chosenHour < 10
     ) {
-     console.log("out")
-      badTime()
-    } else if (reservation.reservation_date === newToday) {
+      console.log("out");
+      badTime();
+    } else {
+      setError("");
+      setSubmitAttempt(false);
+    }
+
+    console.log("reservation.reservation_date === newToday",
+      reservation.reservation_date === newToday ,"/",
+      "currentHour < chosenHour",
+      currentHour < chosenHour,
+      "/",
+      "currentHour > chosenHour",
+      currentHour > chosenHour,
+      "/",
+      "currentMinute < chosenMinutes",
+      currentMinute < chosenMinutes,
+      "/"
+    );
+
+    if (reservation.reservation_date === newToday) {
       // if the chosen hour is later than the current hour (current hour is less than chosen hour) set reservation time
       if (currentHour < chosenHour) {
         setError("");
@@ -115,7 +129,7 @@ function ReservationForm({ initialFormData }) {
       }
       // if the chosen hour is earlier than the current hour (current hour is greater than the chosen hour ) display error message
       else if (currentHour > chosenHour) {
-        badTime()
+        badTime();
       }
       // if hours are the same check minutes
       else {
@@ -126,7 +140,7 @@ function ReservationForm({ initialFormData }) {
         }
         // if the chosen minute is earlier than the current minute (current minute is greater than chosen minute) display error message
         else {
-          badTime()
+          badTime();
         }
       }
     }
@@ -180,7 +194,7 @@ function ReservationForm({ initialFormData }) {
     if (isEdit) {
       try {
         await editReservation(
-          reservation,
+          {...reservation, people:Number(reservation.people)},
           reservation.reservation_id,
           abortController.signal
         );
@@ -192,7 +206,7 @@ function ReservationForm({ initialFormData }) {
       }
     } else if (isNew) {
       try {
-        await createReservation(reservation, abortController.signal);
+        await createReservation({...reservation, people:Number(reservation.people)}, abortController.signal);
         // navigate to dashboard is promise is resolved
         navigateToDashboard();
       } catch (error) {

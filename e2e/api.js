@@ -78,6 +78,17 @@ async function createTable(table, signal) {
   return await fetchJson(url, options, table);
 }
 
+ async function finishReservation(tableId, signal) {
+  const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+  const options = {
+    method: "DELETE",
+    headers,
+    signal,
+  };
+
+  return await fetchJson(url, options, signal);
+}
+
 async function seatReservation(reservation_id, table_id) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   const options = {
@@ -92,4 +103,5 @@ module.exports = {
   createReservation,
   createTable,
   seatReservation,
+  finishReservation
 };

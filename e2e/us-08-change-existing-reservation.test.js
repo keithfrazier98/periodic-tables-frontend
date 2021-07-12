@@ -34,6 +34,7 @@ describe("US-08 - Change an existing reservation - E2E", () => {
       reservation_time: "14:00",
       people: 4,
     });
+    console.log(reservation)
     page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
     page.on("console", onPageConsole);
@@ -56,8 +57,9 @@ describe("US-08 - Change an existing reservation - E2E", () => {
           path: ".screenshots/us-08-dashboard-edit-click-before.png",
           fullPage: true,
         });
-
         const hrefSelector = `[href="/reservations/${reservation.reservation_id}/edit"]`;
+        console.log(hrefSelector)
+
         await page.waitForSelector(hrefSelector);
 
         await page.screenshot({

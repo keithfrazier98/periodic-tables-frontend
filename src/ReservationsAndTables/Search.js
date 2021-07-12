@@ -9,10 +9,11 @@ function Search() {
   const [mobile_number, setMobileNumber] = useState(placeholder);
   const [searchError, setSearchError] = useState("");
   const [emptySearch, setEmptySearch] = useState(true);
-  const [noResultsFound, setNoResultsFound] = useState(false);
+  const [noResultsFound, setNoResultsFound] = useState(true);
+  const [clicked, setClicked] = useState(0)
   useEffect(() => {
     loadReservations();
-  }, [mobile_number]);
+  }, [mobile_number, clicked]);
 
   async function loadReservations() {
     try {
@@ -31,6 +32,8 @@ function Search() {
       }
     } catch (error) {
       setSearchError(error);
+      setNoResultsFound(true);
+
     }
   }
 
@@ -45,11 +48,13 @@ function Search() {
   }
 
   function onChange({ target: { value } }) {
-    if (value !== " ") search(value);
+    if (value !== " " || value !== "" ) search(value);
   }
 
   function handleSubmit(event) {
-    event.preventDefault();
+    if(event){
+      event.preventDefault();
+    }
     search(mobile_number);
   }
 
@@ -85,7 +90,7 @@ function Search() {
               </label>
             </div>
             <div className="col">
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" role="button" onClick={()=>{setClicked(clicked + 1)}} className="btn btn-primary">
                 Find
               </button>
             </div>
