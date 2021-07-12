@@ -4,7 +4,6 @@ import {
   listTables,
   assignResIdToTable,
   getReservation,
-  changeStatus,
 } from "../utils/api";
 import { useParams, useHistory } from "react-router-dom";
 
@@ -119,7 +118,7 @@ function SeatReservation() {
         selection,
         abortController.signal
       );
-      history.push(`/dashboard?date=${reservation.reservation_date}`);
+      history.push(`/dashboard?date=${reservation.reservation_date.substring(0,10)}`);
     } else {
       setPartyIsSmallerThanCap(false);
     }
@@ -127,7 +126,7 @@ function SeatReservation() {
   }
 
   function handleCancel() {
-    history.push(`/dashboard?date=${reservation.reservation_date}`);
+    history.push(`/dashboard?date=${reservation.reservation_date.substring(0,10)}`);
   }
 
   return (

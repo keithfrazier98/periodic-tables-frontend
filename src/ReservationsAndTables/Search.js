@@ -20,6 +20,7 @@ function Search() {
       if (mobile_number) {
         const reservationResults = await searchByNumber(mobile_number);
         setReservations(reservationResults);
+        setNoResultsFound(false)
         if (
           mobile_number &&
           !reservations.length &&
@@ -28,7 +29,7 @@ function Search() {
           setNoResultsFound(true);
         }
       } else {
-        setNoResultsFound(false);
+        setNoResultsFound(true);
       }
     } catch (error) {
       setSearchError(error);

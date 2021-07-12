@@ -59,7 +59,6 @@
  */
  export async function createReservation(reservation, signal) {
   const url = `${API_BASE_URL}/reservations`;
-  console.log(reservation, "to ->",JSON.stringify({ data: reservation }))
   const options = {
     method: "POST",
     headers,
@@ -68,22 +67,6 @@
   };
   return await fetchJson(url, options, reservation);
 }
-
-
-//old function
-/* 
- export async function createReservation(reservationData, signal) {
-   const url = `${API_BASE_URL}/reservations`;
-   const options = {
-     method: "POST",
-     headers,
-     body: JSON.stringify({ data: reservationData }),
-     signal,
-   };
- 
-   return await fetchJson(url, options);
- }
- */
 
  /**
  * Creates a new table
@@ -100,20 +83,6 @@ export async function createTable(table, signal) {
   };
   return await fetchJson(url, options, table);
 }
-//old function
-/* 
- export async function createTable(tableData, signal) {
-   const url = `${API_BASE_URL}/tables`;
-   const options = {
-     method: "POST",
-     headers,
-     body: JSON.stringify({ data: tableData, signal }),
-     signal,
-   };
- 
-   return await fetchJson(url, options);
- }
- */
 
  export async function finishReservation(tableId, signal) {
    const url = `${API_BASE_URL}/tables/${tableId}/seat`;
@@ -122,7 +91,6 @@ export async function createTable(table, signal) {
      headers,
      signal,
    };
- 
    return await fetchJson(url, options, signal);
  }
  
@@ -137,19 +105,7 @@ export async function createTable(table, signal) {
   return await fetchJson(url, options, {});
 }
 
-//old function
-/*
- export async function assignResIdToTable(reservation_id, table_id, signal) {
-   const url = new URL(`${API_BASE_URL}/tables/${table_id}/seat`);
-   const options = {
-     method: "PUT",
-     headers,
-     body: JSON.stringify({ data: { reservation_id: reservation_id }, signal }),
-     signal,
-   };
-   return await fetchJson(url, options);
- }
- */
+
  export async function listTables(signal) {
    const url = new URL(`${API_BASE_URL}/tables`);
    return await fetchJson(url, { headers, signal }, []);

@@ -81,7 +81,6 @@ function ReservationForm({ initialFormData }) {
       (form) => (form = { ...form, reservation_time: timeChosen })
     );
 
-    console.log(reservation, timeChosen);
     let chosenMinutes = Number(`${timeChosen[3]}${timeChosen[4]}`);
     let chosenHour = Number(`${timeChosen[0]}${timeChosen[1]}`);
  
@@ -89,37 +88,21 @@ function ReservationForm({ initialFormData }) {
     const currentTime = new Date(Date.now());
     const currentHour = currentTime.getHours();
     const currentMinute = currentTime.getMinutes();
-    console.log(chosenHour, chosenMinutes);
 
     
     //return error message if chosen time is outsisde operating hours
 
-    console.log(chosenHour, chosenMinutes)
     if (
       (chosenHour >= 21 && chosenMinutes > 30) ||
       chosenHour > 21 ||
       (chosenHour <= 10 && chosenMinutes < 30) ||
       chosenHour < 10
     ) {
-      console.log("out");
       badTime();
     } else {
       setError("");
       setSubmitAttempt(false);
     }
-
-    console.log("reservation.reservation_date === newToday",
-      reservation.reservation_date === newToday ,"/",
-      "currentHour < chosenHour",
-      currentHour < chosenHour,
-      "/",
-      "currentHour > chosenHour",
-      currentHour > chosenHour,
-      "/",
-      "currentMinute < chosenMinutes",
-      currentMinute < chosenMinutes,
-      "/"
-    );
 
     if (reservation.reservation_date === newToday) {
       // if the chosen hour is later than the current hour (current hour is less than chosen hour) set reservation time
@@ -157,7 +140,6 @@ function ReservationForm({ initialFormData }) {
   const [cancelled, setCancelled] = useState("");
 
   useEffect(() => {
-    console.log(cancelled);
     if (cancelled) {
       changeStatusCancel(cancelled);
       navigateToDashboard();
@@ -221,7 +203,6 @@ function ReservationForm({ initialFormData }) {
   function handleSubmit(event) {
     event.preventDefault();
     setSubmitAttempt(true);
-    console.log(error);
     if (!error) {
       APIOnSubmit(event);
     }

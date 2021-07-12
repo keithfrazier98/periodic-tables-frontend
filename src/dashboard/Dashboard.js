@@ -69,7 +69,6 @@ function Dashboard({ date }) {
 
   // call api to load reservation data
   async function loadReservations() {
-    console.log("loading reservations")
     const abortController = new AbortController();
     try {
       setReservationsError(null);
