@@ -91,7 +91,7 @@ export async function createTable(table, signal) {
      headers,
      signal,
    };
-   return await fetchJson(url, options, signal);
+  return await fetchJson(url, options, signal);
  }
  
 //seat reservation
