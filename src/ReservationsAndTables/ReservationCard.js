@@ -18,9 +18,7 @@ function ReservationCard({
   const isSearch = pathname.includes("search");
 
   useEffect(() => {
-    console.log("loading reservations in reservation card",reservationsLoaded)
       loadReservations()
-      console.log("loading reservations in reservation card if statement", reservationsLoaded)
   }, [tablesLoaded, reservationsLoaded]);
 
   useEffect(() => {
@@ -65,7 +63,6 @@ function ReservationCard({
   }
 
   function formatElements(reservations) {
-    console.log(reservations.length);
     const formattedReservationElements =
       reservations.length === 0 ? (
         <div className="card">Your reservations will go here!</div>

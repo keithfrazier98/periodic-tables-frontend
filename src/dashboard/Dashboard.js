@@ -50,7 +50,6 @@ function Dashboard({ date }) {
       loadTables();
       setTablesLoaded(true);
       setReservationsLoaded(false)
-      console.log( "loading tables", `${tablesLoaded}`,"reservations loaded",reservationsLoaded);
       if (cancelled) {
         changeStatusCancel(cancelled);
       }
@@ -122,7 +121,7 @@ function Dashboard({ date }) {
         await deleteTableAPI(
           event.target.dataset.table_id,
           abortController.signal
-        ).then(console.log);
+        )
         setTablesLoaded(false);
         window.alert("Table Deleted.");
       } catch (err) {
