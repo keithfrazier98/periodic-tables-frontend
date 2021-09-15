@@ -5,6 +5,7 @@ import {
   listTables,
   finishReservation,
   changeStatus,
+  deleteTableAPI,
 } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "../ReservationsAndTables/ReservationCard";
@@ -39,22 +40,22 @@ function Dashboard({ date }) {
   //states for tables data and errors
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
-  const [tablesLoaded, setTablesLoaded] = useState(false)
+  const [tablesLoaded, setTablesLoaded] = useState(false);
 
   //called on initial render and state update to render table
   //and reservation data
   useEffect(() => {
-    loadTables();
-    if (cancelled) {
-      changeStatusCancel(cancelled);
-    }
-  }, [date, cancelled, finishIds]);
+    if (!tablesLoaded || finishIds) {
+      loadTables();
+      setTablesLoaded(true);
+      console.log("loading tables");
+      if (cancelled) {
+        changeStatusCancel(cancelled);
+      }
+    } 
+  }, [date, cancelled, finishIds, tablesLoaded]);
 
-  useEffect(() => {
-    if(tablesLoaded){
-      loadReservations();
-    }
-  }, [tablesLoaded]);
+
   // call api to cancel reservation
   async function changeStatusCancel(cancelledReservation) {
     const abortController = new AbortController();
@@ -67,31 +68,11 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  // call api to load reservation data
-  async function loadReservations() {
-    const abortController = new AbortController();
-    try {
-      setReservationsError(null);
-      const result = await listReservations({ date }, abortController.signal);
-      result.filter(
-        (reservation) =>
-          reservation.status === "booked" || reservation.status === "seated"
-      );
-
-      setReservations(
-        result.sort(
-          (resA, resB) => resA.reservation_time > resB.reservation_time
-        )
-      );
-    } catch (error) {
-      setReservationsError(error);
-    }
-    return () => abortController.abort();
-  }
+  
 
   // call api to load tables data
   async function loadTables() {
-    setTablesLoaded(false)
+    setTablesLoaded(false);
     setTables((tables) => (tables = []));
     setTablesError((error) => (error = null));
     const { tableId } = finishIds;
@@ -107,7 +88,6 @@ function Dashboard({ date }) {
       }
       const fetchedTables = await listTables(abortController.signal);
       setTables((tbls) => (tbls = fetchedTables));
-      setTablesLoaded(true)
     } catch (error) {
       setTablesError(error);
     }
@@ -118,7 +98,7 @@ function Dashboard({ date }) {
   function finishHandler({ target }) {
     if (
       window.confirm(
-        "Is this table ready to seat new guests? This cannot be undone."
+        "Is this table ready to seat new guests? This action cannot be undone."
       )
     ) {
       setFinishIds({
@@ -128,49 +108,97 @@ function Dashboard({ date }) {
     }
   }
 
+  async function deleteTable(event) {
+    const abortController = new AbortController();
+
+    if (
+      window.confirm(
+        "Do you want to delete this table? This action cannot be undone."
+      )
+    ) {
+      try {
+        await deleteTableAPI(
+          event.target.dataset.table_id,
+          abortController.signal
+        ).then(console.log);
+        setTablesLoaded(false);
+        window.alert("Table Deleted.");
+      } catch (err) {
+        console.error("A problem occured when trying to delete table.");
+      }
+    }
+    return () => abortController.abort();
+  }
+
   // format tables list to jsx elements
-  const tablesList = tables.map((table) => {
-    let backgroundColor = table.reservation_id ? "occupied" : "free";
-    return (
-      <li className={`list-group-item ${backgroundColor}`} key={table.table_id}>
-        <div>
-          <div className="row">
-            <div className="col">
-              <h4>Table Name</h4>
-              <p>{table.table_name}</p>
-              <h4>Table Capacity</h4>
-              <p>{table.capacity}</p>
-            </div>
-            {table.reservation_id ? (
+  const tablesList =
+    tables.length === 0 ? (
+      <li className='list-group-item free' key={0}>
+        Your tables will go here!
+      </li>
+    ) : (
+      tables.map((table) => {
+        let backgroundColor = table.reservation_id ? "occupied" : "free";
+        return (
+          <li
+            className={`list-group-item ${backgroundColor}`}
+            key={table.table_id}
+          >
+            <div>
               <div className="row">
                 <div className="col">
-                  <span
-                    className="badge bg-success"
-                    data-table-id-status={table.table_id}
-                  >
-                    occupied
-                  </span>
-                  <br />
-                  <button
-                    onClick={finishHandler}
-                    data-table-id-finish={table.table_id}
-                    data-reservation-id-finish={table.reservation_id}
-                    className="btn btn-danger"
-                  >
-                    Finish
-                  </button>
+                  <h4>Table Name</h4>
+                  <p>{table.table_name}</p>
+                  <h4>Table Capacity</h4>
+                  <p>{table.capacity}</p>
+                  {table.reservation_id ? null : (
+                    <button
+                      className="btn btn-danger "
+                      id="deleteTable"
+                      onClick={deleteTable}
+                      role="button"
+                      data-table_id={table.table_id}
+                    >
+                      Delete Table
+                    </button>
+                  )}
                 </div>
+                {table.reservation_id ? (
+                  <div className="row">
+                    <div className="col">
+                      <span
+                        className="badge bg-success"
+                        data-table-id-status={table.table_id}
+                      >
+                        occupied
+                      </span>
+                      <br />
+                      <button
+                        onClick={finishHandler}
+                        data-table-id-finish={table.table_id}
+                        data-reservation-id-finish={table.reservation_id}
+                        className="btn btn-danger"
+                      >
+                        Finish
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <span
+                      data-table-id-status={table.table_id}
+                      className="badge bg-primary"
+                    >
+                      free
+                    </span>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>
-                <span data-table-id-status={table.table_id} className="badge bg-primary">free</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </li>
+            </div>
+          </li>
+        );
+      })
     );
-  });
 
   return (
     <main className="container">
@@ -191,9 +219,13 @@ function Dashboard({ date }) {
             <ul className="list-group">
               {
                 <ReservationCard
+                date={date}
+                setReservationsError ={setReservationsError}
+                setReservations = {setReservations}
                   reservations={reservations}
                   cancelled={cancelled}
                   setCancelled={setCancelled}
+                  finishIds={finishIds}
                 />
               }
             </ul>

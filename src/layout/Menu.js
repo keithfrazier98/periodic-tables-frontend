@@ -1,5 +1,5 @@
 import React from "react";
-
+import './Menu.css'
 import { Link } from "react-router-dom";
 
 /**
@@ -13,7 +13,7 @@ function Menu() {
     <nav className="navbar navbar-dark align-items-start p-0">
       <div className="container-fluid d-flex flex-column p-0">
         <Link
-          className="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0"
+          className="navbar-brand d-flex sidebar-brand m-0"
           to="/"
         >
           <div className="sidebar-brand-text mx-3">
