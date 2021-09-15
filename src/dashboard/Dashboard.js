@@ -41,6 +41,7 @@ function Dashboard({ date }) {
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
   const [tablesLoaded, setTablesLoaded] = useState(false);
+  const [reservationsLoaded, setReservationsLoaded] = useState(false)
 
   //called on initial render and state update to render table
   //and reservation data
@@ -48,7 +49,8 @@ function Dashboard({ date }) {
     if (!tablesLoaded || finishIds) {
       loadTables();
       setTablesLoaded(true);
-      console.log("loading tables");
+      setReservationsLoaded(false)
+      console.log( "loading tables", `${tablesLoaded}`,"reservations loaded",reservationsLoaded);
       if (cancelled) {
         changeStatusCancel(cancelled);
       }
@@ -153,6 +155,7 @@ function Dashboard({ date }) {
                   <p>{table.capacity}</p>
                   {table.reservation_id ? null : (
                     <button
+                      disabled={table.reservation_id}
                       className="btn btn-danger "
                       id="deleteTable"
                       onClick={deleteTable}
@@ -226,6 +229,8 @@ function Dashboard({ date }) {
                   cancelled={cancelled}
                   setCancelled={setCancelled}
                   finishIds={finishIds}
+                  reservationsLoaded={reservationsLoaded}
+                  setReservationsLoaded = {setReservationsLoaded}
                 />
               }
             </ul>

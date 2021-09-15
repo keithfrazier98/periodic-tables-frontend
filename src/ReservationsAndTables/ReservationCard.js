@@ -9,6 +9,8 @@ function ReservationCard({
   setReservationsError,
   setReservations,
   tablesLoaded,
+  reservationsLoaded,
+  setReservationsLoaded,
 }) {
   const [reservationElements, setReservationElements] = useState([]);
   const { pathname } = useLocation();
@@ -16,15 +18,14 @@ function ReservationCard({
   const isSearch = pathname.includes("search");
 
   useEffect(() => {
-      loadReservations();
-  }, [tablesLoaded]);
+    console.log("loading reservations in reservation card",reservationsLoaded)
+      loadReservations()
+      console.log("loading reservations in reservation card if statement", reservationsLoaded)
+  }, [tablesLoaded, reservationsLoaded]);
 
-  
   useEffect(() => {
-    console.log(reservations, "creating cards")
-      setReservationElements(formatElements(reservations));
-
-  }, [reservations, tablesLoaded]);
+    setReservationElements(formatElements(reservations));
+  }, [reservations]);
 
   // call api to load reservation data
   async function loadReservations() {
@@ -42,6 +43,9 @@ function ReservationCard({
           (resA, resB) => resA.reservation_time > resB.reservation_time
         )
       );
+
+      setReservationsLoaded(true);
+
     } catch (error) {
       setReservationsError(error);
     }
