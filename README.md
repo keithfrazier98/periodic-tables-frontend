@@ -2,6 +2,7 @@
 ## Restaurant Reservation System
 
 > Link to live app: https://periodic-tables-frontend-g5bb766k5-keithfrazier98.vercel.app/
+> Link to backend repo: https://github.com/keithfrazier98/periodic-tables-backend
 
 ### Overview
 
