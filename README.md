@@ -78,3 +78,11 @@ Clicking the "search" option from the menu will navigate the user to the search 
 
 
 
+## Edge Cases
+- the functions that call to the API are wrapped in try and catch blocks, and there are error states that will catch errors and display them to the user. As of now, verified by tests, errors are caught and handled without the application crashing. 
+  - you will see errors if you: 
+    - make a reservation for a time in the past 
+    - make a reservation for a time outside of working hours 
+    - there are too many connections to the database 
+    - the server hosting the backend is down 
+    - fail to fill out a required input in either form 
