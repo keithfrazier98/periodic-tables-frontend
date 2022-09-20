@@ -12,7 +12,7 @@
 
 ### /Dashboard (/)
 The main url will always redirect to the dahsboard which will default to displaying the tables and the current date's as reservations. 
-![dashboard](./images/Dashboard.png)
+![dashboard](/images/Dashboard.png)
 
 <hr>
 
